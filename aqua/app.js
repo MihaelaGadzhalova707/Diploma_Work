@@ -10,7 +10,7 @@ var expressValidator = require('express-validator');
 var multer = require('multer');
 var upload = multer({dest: './uploads'});
 var flash = require('connect-flash');
-//var bcrypt = require('bcryptjs');
+var bcrypt = require('bcryptjs');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
 
@@ -18,6 +18,7 @@ var db = mongoose.connection;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+// var valvesRouter = require('./routes/valves');
 
 var app = express(); //instantiating the 'app' variable with express
 
@@ -66,8 +67,15 @@ app.use(function(req, res, next) {
 	next();
 });
 
+//GLOBAL VARIABLE
+app.get('*', function(req, res, next){
+  res.locals.user = req.user || null;
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+// app.use('/valves', valvesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
