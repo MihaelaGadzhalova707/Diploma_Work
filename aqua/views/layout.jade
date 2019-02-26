@@ -4,6 +4,7 @@ html(lang='en')
     title Welcome
     link(href='/stylesheets/bootstrap.css', rel='stylesheet')
     link(href='/stylesheets/style.css', rel='stylesheet')
+
    
   body
     .navbar.navbar-default(role='navigation')
@@ -18,7 +19,7 @@ html(lang='en')
         .navbar-collapse.collapse
           ul.nav.navbar-nav
             if user
-             li(class=(title == 'Members' ? 'active' : ''))
+             li(class=(title == 'Home' ? 'active' : ''))
                a(href='/new_coffee') New Coffee
             if !user
              li(class=(title == 'Register' ? 'active' : ''))

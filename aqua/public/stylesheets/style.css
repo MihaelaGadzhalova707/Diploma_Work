@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 50px; /*this way menu bar is not all the way up*/
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
