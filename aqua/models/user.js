@@ -10,17 +10,17 @@ var db = mongoose.connection;
 
 //USER SCHEMA
 var UserSchema = mongoose.Schema({
-	username: {
-		type: String,
-		index: true
-	},
-	password: {
+	name: {
 		type: String
 	},
 	email: {
 		type: String
 	},
-	name: {
+	username: {
+		type: String,
+		index: true
+	},
+	password: {
 		type: String
 	},
 	profileimage: {
