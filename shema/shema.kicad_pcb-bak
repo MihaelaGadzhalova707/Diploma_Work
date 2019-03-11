@@ -60,7 +60,7 @@
     (pad_to_mask_clearance 0.051)
     (solder_mask_min_width 0.25)
     (aux_axis_origin 0 0)
-    (visible_elements 7FFFFFFF)
+    (visible_elements FFFFFF7F)
     (pcbplotparams
       (layerselection 0x010fc_ffffffff)
       (usegerberextensions false)
@@ -1890,7 +1890,7 @@
   )
 
   (module "ESP8266:NodeMCU1.0(12-E)" (layer F.Cu) (tedit 5AF3DDCB) (tstamp 5CA1166D)
-    (at 48.768 148.082)
+    (at 99.135001 -71.044999)
     (path /5C1139D2)
     (fp_text reference U1 (at 0 0) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
