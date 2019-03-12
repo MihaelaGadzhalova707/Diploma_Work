@@ -407,42 +407,32 @@ Wire Wire Line
 	3750 7300 3000 7300
 Wire Wire Line
 	3750 5250 3000 5250
-Wire Wire Line
-	2950 3000 2950 7850
-Wire Wire Line
-	2950 7850 2850 7850
-Wire Wire Line
-	3000 7950 2850 7950
-Wire Wire Line
-	3050 8050 2850 8050
-Wire Wire Line
-	3100 8150 2850 8150
 NoConn ~ 4550 8000
-Text Label 5200 3000 2    50   ~ 0
+Text Label 5200 3700 2    50   ~ 0
 Led_Red
-Text Label 5200 3100 2    50   ~ 0
+Text Label 5200 3600 2    50   ~ 0
 Led_Green
-Text Label 5200 3200 2    50   ~ 0
+Text Label 5200 3500 2    50   ~ 0
 Led_Blue
-Text Label 5200 3300 2    50   ~ 0
-Led_White
 Text Label 5200 3400 2    50   ~ 0
+Led_White
+Text Label 5200 3300 2    50   ~ 0
 Water_Pump
-Text Label 5200 5050 2    50   ~ 0
+Text Label 5200 5450 2    50   ~ 0
 Valve_01
-Text Label 5200 5150 2    50   ~ 0
+Text Label 5200 5350 2    50   ~ 0
 Valve_02
 Text Label 5200 5250 2    50   ~ 0
 Valve_03
-Text Label 5200 5350 2    50   ~ 0
+Text Label 5200 5150 2    50   ~ 0
 Valve_04
-Text Label 5200 3500 2    50   ~ 0
+Text Label 5200 3200 2    50   ~ 0
 Heater_01
-Text Label 5200 3600 2    50   ~ 0
+Text Label 5200 3100 2    50   ~ 0
 Heater_02
-Text Label 5200 3700 2    50   ~ 0
+Text Label 5200 5550 2    50   ~ 0
 Cooling
-Text Label 5200 5450 2    50   ~ 0
+Text Label 5200 5050 2    50   ~ 0
 Wave_Maker
 Text Label 800  7850 0    50   ~ 0
 PH_Sensor
@@ -968,8 +958,6 @@ Wire Wire Line
 Wire Wire Line
 	13400 5950 13400 5850
 Connection ~ 13400 5950
-Wire Wire Line
-	5200 3000 4550 3000
 Text Label 3400 8250 2    50   ~ 0
 Temp_sensor
 Wire Wire Line
@@ -1067,10 +1055,6 @@ Wire Wire Line
 	3000 5250 3000 7300
 Wire Wire Line
 	3000 7300 3000 7950
-Wire Wire Line
-	3050 7400 3050 8050
-Wire Wire Line
-	3100 7600 3100 8150
 $Comp
 L Connector_Generic:Conn_01x03 J6
 U 1 1 5CC0AEAA
@@ -1469,4 +1453,20 @@ F 3 "" H 10950 6300 50  0001 L CNN
 	1    10950 6300
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	4550 5550 5200 5550
+Wire Wire Line
+	3000 7950 2850 7950
+Wire Wire Line
+	3050 7850 2850 7850
+Wire Wire Line
+	3050 7400 3050 7850
+Wire Wire Line
+	3100 8050 2850 8050
+Wire Wire Line
+	3100 7600 3100 8050
+Wire Wire Line
+	2950 3000 2950 8150
+Wire Wire Line
+	2950 8150 2850 8150
 $EndSCHEMATC
