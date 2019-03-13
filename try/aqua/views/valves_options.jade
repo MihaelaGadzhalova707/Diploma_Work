@@ -1,0 +1,85 @@
+extends layout
+
+block content
+ h2.smth
+ p
+    b Please choose the state of the valves below
+
+  p Here we present your options for combinations:
+    p 
+     b Whatever action you're doing, the water pump always must be turned on
+    p - draining water:
+      b   Open valves 2 and 3. Valves 1 and 4 stay closed
+    p - water injection:
+      b   Open valves 1 and 4. Valves 2 and 3 stay closed
+    p - cooling water:
+      b   Open valves 1 and 4. Valves 2 and 3 stay closed. The cooler also should be put on "ON"
+    p - no action:
+      b   All valves stay closed. The pump is all turned off
+ if errors
+  each error, i in errors
+   div.alert.alert-danger #{error.msg}
+
+ form(method='get', action='/valves_options')
+  .form-group
+  label Water pump:
+  .form-check.form-check-inline
+   input#OneCup.form-check-input(type='radio', name='count', value='make_one_cup', checked = 'checked')
+   label.form-check-label(for='OneCup') ON
+  .form-check.form-check-inline
+   input#TwoCups.form-check-input(type='radio', name='count', value='make_two_cups')
+   label.form-check-label(for='TwoCups') OFF
+
+ form(method='get', action='/valves_options')
+  .form-group
+  label Valve 1:
+  .form-check.form-check-inline
+   input#OpenValve.form-check-input(type='radio', name='option', value='open_valve', checked = 'checked')
+   label.form-check-label(for='OpenValve') Open
+  .form-check.form-check-inline
+   input#CloseValve.form-check-input(type='radio', name='option', value='close_valve')
+   label.form-check-label(for='CloseValve') Close
+
+ form(method='get', action='/valves_options')
+  .form-group
+  label Valve 2:
+  .form-check.form-check-inline
+   input#OneCup.form-check-input(type='radio', name='count', value='make_one_cup', checked = 'checked')
+   label.form-check-label(for='OneCup') Open
+  .form-check.form-check-inline
+   input#TwoCups.form-check-input(type='radio', name='count', value='make_two_cups')
+   label.form-check-label(for='TwoCups') Close  
+ 
+ form(method='get', action='/valves_options')
+  .form-group
+  label Valve 3:
+  .form-check.form-check-inline
+   input#OneCup.form-check-input(type='radio', name='count', value='make_one_cup', checked = 'checked')
+   label.form-check-label(for='OneCup') Open
+  .form-check.form-check-inline
+   input#TwoCups.form-check-input(type='radio', name='count', value='make_two_cups')
+   label.form-check-label(for='TwoCups') Close
+
+ form(method='get', action='/valves_options')
+  .form-group
+  label Valve 4:
+  .form-check.form-check-inline
+   input#OneCup.form-check-input(type='radio', name='count', value='make_one_cup', checked = 'checked')
+   label.form-check-label(for='OneCup') Open
+  .form-check.form-check-inline
+   input#TwoCups.form-check-input(type='radio', name='count', value='make_two_cups')
+   label.form-check-label(for='TwoCups') Close 
+
+ form(method='get', action='/valves_options')
+  .form-group
+  label Cooler:
+  .form-check.form-check-inline
+   input#OneCup.form-check-input(type='radio', name='count', value='make_one_cup', checked = 'checked')
+   label.form-check-label(for='OneCup') Open
+  .form-check.form-check-inline
+   input#TwoCups.form-check-input(type='radio', name='count', value='make_two_cups')
+   label.form-check-label(for='TwoCups') Close
+
+ 
+  input.btn.btn-primary(type='submit', name='submit',value = 'Submit')
+
