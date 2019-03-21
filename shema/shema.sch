@@ -436,7 +436,7 @@ Text Label 5200 5650 2    50   ~ 0
 Wave_Maker
 Text Label 800  7850 0    50   ~ 0
 PH_Sensor
-Text Label 3400 8550 2    50   ~ 0
+Text Label 800  8150 0    50   ~ 0
 Flowmeter
 Text Label 17900 9050 0    50   ~ 0
 Underwater_Camera_02
@@ -980,9 +980,9 @@ Wire Wire Line
 	2850 8850 3400 8850
 Wire Wire Line
 	800  8150 1250 8150
-Text Label 800  8150 0    50   ~ 0
+Text Label 3400 8550 2    50   ~ 0
 us_trig
-Text Label 3400 8650 2    50   ~ 0
+Text Label 3400 8850 2    50   ~ 0
 us_01
 Wire Wire Line
 	4550 3100 5200 3100
@@ -1028,7 +1028,7 @@ Text Label 8800 6450 0    50   ~ 0
 Valve_04
 Text Label 3400 8750 2    50   ~ 0
 us_02
-Text Label 3400 8850 2    50   ~ 0
+Text Label 3400 8650 2    50   ~ 0
 us_03
 Wire Wire Line
 	800  7850 1250 7850
