@@ -1,30 +1,7 @@
 #include <NewPing.h>
 
-//#include <NewPing.h>
-//
-//const int TriggerPin = 2;
-//const int EchoPin = 5;
-//
-////100 = maxDistance
-//NewPing sonar(TriggerPin, EchoPin, 150);
-//
-//void setup() {
-//  // put your setup code here, to run once:
-//  Serial.begin(9600);
-//}
-//
-//void loop() {
-//  // put your main code here, to run repeatedly:
-//  int cm = sonar.ping_cm();
-//  Serial.println(cm);
-//  delay(250); 
-//}
-
-
-
-
-#define TriggerPin 2
-#define EchoPin 5
+#define TriggerPin D5
+#define EchoPin D8
 
 float duration, distance;
 

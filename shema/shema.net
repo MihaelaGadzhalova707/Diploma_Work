@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:\Users\Misheto\Desktop\ДИПЛОМНА\shema\shema.sch)
-    (date "18.3.2019 г. 11:36:56")
+    (date "12.4.2019 г. 15:16:45")
     (tool "Eeschema (5.0.1)-4")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -488,7 +488,7 @@
     (library (logical ESP8266)
       (uri C:/Users/Misheto/Desktop/ДИПЛОМНА/kicad-ESP8266-master/ESP8266.lib))
     (library (logical IRLML6344)
-      (uri C:/Users/Misheto/Desktop/kicad-lib-master/IRLML6344.lib))
+      (uri C:\Users\Misheto\Desktop\ДИПЛОМНА\kicad-lib-master\IRLML6344.lib))
     (library (logical Transistor_FET)
       (uri "C:\\Program Files\\KiCad\\share\\kicad\\library/Transistor_FET.lib"))
     (library (logical pspice)

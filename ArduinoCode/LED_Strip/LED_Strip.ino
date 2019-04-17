@@ -18,22 +18,22 @@ void loop() {
   // put your main code here, to run repeatedly:
   int r, g, b, w;
 
-  for (int r = 0; r <= 255; r++) {
+  for (r = 0; r <= 255; r++) {
     analogWrite(RED_LED, r);
     delay(FADESPEED);
   }
 
-  for (int g = 0; g <= 255; g++) {
+  for (g = 0; g <= 255; g++) {
     analogWrite(GREEN_LED, g);
     delay(FADESPEED);
   }
 
-  for (int b = 0; b <= 255; b++) {
+  for (b = 0; b <= 255; b++) {
     analogWrite(BLUE_LED, b);
     delay(FADESPEED);
   }
 
-  for (int w = 0; w <= 255; w++) {
+  for (w = 0; w <= 255; w++) {
     analogWrite(WHITE_LED, w);
     delay(FADESPEED);
   }

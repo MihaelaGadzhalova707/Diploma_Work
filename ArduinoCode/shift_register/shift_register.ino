@@ -1,22 +1,90 @@
-#include <ShiftRegister74HC595.h>
+//#include <ShiftRegister74HC595.h>
+#define DataPin D3
+#define ClockPin D1
+#define LatchPin D2
+#define MR D0
 // create shift register object (number of shift registers, data pin, clock pin, latch pin)
-ShiftRegister74HC595 sr (1, D2,D0,D1); 
-void setup() { 
+//ShiftRegister74HC595 sr (1, D3,D1,D2); 
+
+void resetRegs() {
+  digitalWrite(MR, LOW);
+  delay(1000);
+  digitalWrite(MR, HIGH);
+  delay(1000);
 }
 
+void doLatch() {
+   digitalWrite(LatchPin, HIGH);
+   delay(100);
+   digitalWrite(LatchPin, LOW);
+   delay(100);
+}
+
+void doClock() {
+   digitalWrite(ClockPin, HIGH);
+   delay(100);
+   digitalWrite(ClockPin, LOW);
+   delay(100);
+}
+
+
+
+void setup() {
+Serial.begin(9600);
+
+pinMode(LatchPin, OUTPUT);
+digitalWrite(LatchPin, LOW);
+
+pinMode(ClockPin, OUTPUT);
+digitalWrite(ClockPin, LOW);
+
+pinMode(DataPin, OUTPUT);
+digitalWrite(DataPin, LOW);
+
+pinMode(MR, OUTPUT);
+resetRegs();
+}
+
+
+
+/*/working !!!
 void loop() {
-  sr.setAllHigh(); // set all pins HIGH
-  delay(500);
-  sr.setAllLow(); // set all pins LOW
-  delay(500); 
+//  sr.setAllHigh(); // set all pins HIGH
+//  delay(200);
+//  sr.setAllLow(); // set all pins LOW
+//  delay(200); 
 //  for (int i = 0; i < 8; i++) {
 //    sr.set(i, HIGH); // set single pin HIGH
-//    delay(2000); 
+//    delay(200); 
 //  }
-//  // set all pins at once
-//  uint8_t pinValues[] = { B10101010 }; 
-//  sr.setAll(pinValues); 
-//  delay(5000);
-//  // read pin (zero based)
-//  uint8_t stateOfPin5 = sr.get(5);
+  // set all pins at once
+  uint8_t pinValues[] = { 11101001}; 
+  sr.setAll(pinValues); 
+  delay(200);
+  // read pin (zero based)
+  uint8_t stateOfPin5 = sr.get(5);
+  Serial.println(stateOfPin5);
+}*/
+
+void loop() {
+  digitalWrite(DataPin, HIGH);
+  Serial.println("Setting high");
+  for(int i = 0; i < 24; i++) {
+    doClock();
+  }
+  doLatch();
+  delay(5000);
+  Serial.println("Resetting");
+  digitalWrite(DataPin, LOW);
+  Serial.println("Setting high");
+  for(int i = 0; i < 24; i++) {
+    doClock();
+  }
+  doLatch();
+  delay(5000);
+ 
 }
+
+
+
+
