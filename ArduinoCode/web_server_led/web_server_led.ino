@@ -5,13 +5,15 @@
 
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
+#include <ShiftRegister74HC595.h>
 
 // Replace with your network credentials
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "Mi Phone";
-const char* password = "coffeemaker";
+const char* ssid     = "Bob4o";
+const char* password = "12345678";
 
+ShiftRegister74HC595 sr (2, D3,D1,D2); 
 // Set web server port number to 80
 WiFiServer server(80);
 
@@ -23,17 +25,17 @@ String output5State = "off";
 String output4State = "off";
 WiFiClient client;
 // Assign output variables to GPIO pins
-#define output5 D1
-#define output4 D2
+//#define output5 D1
+//#define output4 D2
 
 void setup() {
   Serial.begin(115200);
   // Initialize the output variables as outputs
-  pinMode(output5, OUTPUT);
-  pinMode(output4, OUTPUT);
-  // Set outputs to LOW
-  digitalWrite(output5, LOW);
-  digitalWrite(output4, LOW);
+//  pinMode(output5, OUTPUT);
+//  pinMode(output4, OUTPUT);
+//  // Set outputs to LOW
+//  digitalWrite(output5, LOW);
+//  digitalWrite(output4, LOW);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
@@ -72,24 +74,29 @@ void loop(){
             client.println("Content-type:text/html");
             client.println("Connection: close");
             client.println();
-            
+            int value;
             // turns the GPIOs on and off
             if (header.indexOf("GET /5/on") >= 0) {
               Serial.println("GPIO 5 on");
               output5State = "on";
-              digitalWrite(output5, HIGH);
+              sr.set(1, HIGH);
+                value = sr.get(1);
+                Serial.println(value);
+//              const uint8_t GPIOPIN[4] = {1,2,D7,D8};
             } else if (header.indexOf("GET /5/off") >= 0) {
               Serial.println("GPIO 5 off");
               output5State = "off";
-              digitalWrite(output5, LOW);
+              sr.set(1, LOW);
+              value = sr.get(1);
+                Serial.println(value);
             } else if (header.indexOf("GET /4/on") >= 0) {
               Serial.println("GPIO 4 on");
               output4State = "on";
-              digitalWrite(output4, HIGH);
+              sr.set(10, HIGH);
             } else if (header.indexOf("GET /4/off") >= 0) {
               Serial.println("GPIO 4 off");
               output4State = "off";
-              digitalWrite(output4, LOW);
+              sr.set(10, LOW);
             }
             
             html();

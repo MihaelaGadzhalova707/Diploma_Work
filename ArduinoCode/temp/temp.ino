@@ -9,8 +9,8 @@
 #include <DallasTemperature.h>
 
 // Replace with your network details
-const char* ssid     = "elsys-cab31";
-const char* password = "elsys-bg.org";
+const char* ssid     = "Bob4o";
+const char* password = "12345678";
 
 // Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
 #define ONE_WIRE_BUS D4
@@ -19,7 +19,8 @@ const char* password = "elsys-bg.org";
 OneWire oneWire(ONE_WIRE_BUS);
 
 // Pass our oneWire reference to Dallas Temperature. 
-DallasTemperature DS18B20(&oneWire);
+//DallasTemperature DS18B20(&oneWire);
+DallasTemperature  DS18B20(&oneWire);
 char temperatureCString[7];
 char temperatureFString[7];
 
@@ -32,7 +33,7 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  DS18B20.begin(); // IC Default 9 bit. If you have troubles consider upping it 12. Ups the delay giving the IC more time to process the temperature measurement
+   DS18B20.begin(); // IC Default 9 bit. If you have troubles consider upping it 12. Ups the delay giving the IC more time to process the temperature measurement
   
   // Connecting to WiFi network
   Serial.println();
@@ -60,14 +61,15 @@ void setup() {
 void getTemperature() {
   float tempC;
   float tempF;
-  do {
+  //do {
     DS18B20.requestTemperatures(); 
     tempC = DS18B20.getTempCByIndex(0);
+    //dtostrf(floatVar, minStringWidthIncDecimalPoint, numVarsAfterDecimal, charBuf);
     dtostrf(tempC, 2, 2, temperatureCString);
     tempF = DS18B20.getTempFByIndex(0);
     dtostrf(tempF, 3, 2, temperatureFString);
     delay(100);
-  } while (tempC == 85.0 || tempC == (-127.0));
+  //} while (tempC == 85.0 || tempC == (-127.0));
 }
 
 // runs over and over again
@@ -96,7 +98,7 @@ void loop() {
             client.println(temperatureCString);
             client.println("*C</h3><h3>Temperature in Fahrenheit: ");
             client.println(temperatureFString);
-            client.println("*F</h3></body></html>"); 
+            client.println("*F</h3></body></html>");  
             break;
         }
         if (c == '\n') {
