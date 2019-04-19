@@ -14,7 +14,7 @@
 
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "elsys-cab31";
+const char* ssid     = "elsys";
 const char* password = "elsys-bg.org";
 
 // Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
@@ -129,11 +129,11 @@ void loop(){
             } else if (header.indexOf("GET /led_white/on") >= 0) {
               Serial.println("Led White on");
               ledWhiteState = "on";
-              sr.set(10, HIGH);
+              sr.set(4, HIGH);
             } else if (header.indexOf("GET /led_white/off") >= 0) {
               Serial.println("Led Green off");
               ledWhiteState = "off";
-              sr.set(10, LOW);
+              sr.set(4, LOW);
             }
             
             html();

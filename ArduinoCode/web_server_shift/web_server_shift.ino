@@ -12,7 +12,7 @@
 
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "elsys-cab31";
+const char* ssid     = "elsys";
 const char* password = "elsys-bg.org";
 
 ShiftRegister74HC595 sr (2, D3,D1,D2); 
