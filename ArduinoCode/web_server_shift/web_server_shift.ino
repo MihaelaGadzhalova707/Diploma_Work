@@ -12,8 +12,8 @@
 
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "elsys";
-const char* password = "elsys-bg.org";
+const char* ssid     = "TUES Fest 2019";
+const char* password = "elsysisthebest";
 
 ShiftRegister74HC595 sr (2, D3,D1,D2); 
 // Set web server port number to 80

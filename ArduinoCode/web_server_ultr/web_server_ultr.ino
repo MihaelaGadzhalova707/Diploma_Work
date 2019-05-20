@@ -9,8 +9,9 @@
 // Replace with your network details
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "elsys-cab31";
-const char* password = "elsys-bg.org";
+const char* ssid     = "TUES Fest 2019";
+const char* password = "elsysisthebest";
+
 
 #define TriggerPin D5
 #define EchoPin_J4 D6
@@ -125,7 +126,7 @@ void loop() {
               Serial.println(distance_J2);
               delay(500);
             }
-            client.println("<head></head><body><h1>Distance for J3</h1><h3>Distance: ");
+            client.println("<h1>Distance for J3</h1><h3>Distance: ");
             if(distance_J3 >= 400 || distance_J3 <= 2) {
               Serial.println("Out of range");
               client.println("Out of range");
@@ -134,7 +135,7 @@ void loop() {
               Serial.println(distance_J3);
               delay(500);
             }
-            client.println("<head></head><body><h1>Distance for J4</h1><h3>Distance: ");
+            client.println("><h1>Distance for J4</h1><h3>Distance: ");
             if(distance_J4 >= 400 || distance_J4 <= 2) {
               Serial.println("Out of range");
               client.println("Out of range");

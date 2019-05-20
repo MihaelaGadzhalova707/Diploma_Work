@@ -1,7 +1,7 @@
 #include <NewPing.h>
 
 #define TriggerPin D5
-#define EchoPin D7
+#define EchoPin D6
 
 float duration, distance;
 

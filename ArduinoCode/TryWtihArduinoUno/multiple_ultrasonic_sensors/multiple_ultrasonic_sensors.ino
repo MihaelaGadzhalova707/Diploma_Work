@@ -1,9 +1,9 @@
 #include <NewPing.h>
 
-#define TriggerPin 5
-#define EchoPin_J4 6
-#define EchoPin_J3 7
-#define EchoPin_J2 4
+#define TriggerPin D5
+#define EchoPin_J4 D6
+#define EchoPin_J3 D7
+#define EchoPin_J2 D8
 
 float duration_J4, distance_J4;
 float duration_J3, distance_J3;
@@ -20,12 +20,26 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  trigger_pin();
+  echo_pin_J4(); 
+    delay(500);
+  trigger_pin();  
+  echo_pin_J3();
+    delay(500);
+  trigger_pin();
+  echo_pin_J2();
+    delay(500);
+}
+
+void trigger_pin() {
   digitalWrite(TriggerPin, LOW);
   delayMicroseconds(2);
   digitalWrite(TriggerPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(TriggerPin, LOW);
+}
 
+void echo_pin_J4() {
   duration_J4 = pulseIn(EchoPin_J4, HIGH);
   distance_J4 = (duration_J4 / 2) * 0.0343;
   
@@ -37,15 +51,9 @@ void loop() {
     Serial.println(" cm");
     delay(500); 
   }
+}
 
-  delay(500); 
-
-    digitalWrite(TriggerPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TriggerPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TriggerPin, LOW);
-
+void echo_pin_J3() {
   duration_J3 = pulseIn(EchoPin_J3, HIGH);
   distance_J3 = (duration_J3 / 2) * 0.0343;
   
@@ -57,15 +65,9 @@ void loop() {
     Serial.println(" cm");
     delay(500); 
   }
-  
-  delay(500);
+}
 
-   digitalWrite(TriggerPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TriggerPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TriggerPin, LOW);
-
+void echo_pin_J2() {
   duration_J2 = pulseIn(EchoPin_J2, HIGH);
   distance_J2 = (duration_J2 / 2) * 0.0343;
   
@@ -77,6 +79,9 @@ void loop() {
     Serial.println(" cm");
     delay(500); 
   }
-
-  delay(500);
 }
+
+
+
+
+
