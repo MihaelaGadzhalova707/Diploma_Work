@@ -5,6 +5,7 @@
 
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
 #include <ShiftRegister74HC595.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -36,11 +37,16 @@ DallasTemperature DS18B20(&oneWire);
 char temperatureCString[7];
 char temperatureFString[7];
 
-
+// create shift register object (number of shift registers, data pin, clock pin, latch pin)
 ShiftRegister74HC595 sr (2, D3,D1,D2); 
 // Set web server port number to 80
 WiFiServer server(80);
 WiFiClient client;
+ESP8266WiFiMulti wifiMulti;
+
+IPAddress local_IP(192, 168, 0, 111);
+IPAddress gateway(192, 168, 0, 1);
+IPAddress subnet(255, 255, 0, 0);
 
 
 // Variable to store the HTTP request
@@ -51,14 +57,24 @@ String ledRedState = "off"; //1-1
 String ledGreenState = "off"; //1-2
 String ledBlueState = "off"; //1-3
 String ledWhiteState = "off"; //1-4
+String waterPumpState = "off"; //1-5
 
 String firstValveState = "off"; //2-9
 String secondValveState = "off"; //2-10
 String thirdValveState = "off"; //2-11
 String fourthValveState = "off"; //2-12
 
+String waterInjectionState = "off";
+String waterDrainingState = "off";
+
 void setup() {
   Serial.begin(115200);
+
+  WiFi.mode(WIFI_STA);
+  wifiMulti.addAP("ssid_from_AP_1", "password_for_AP_1");
+  wifiMulti.addAP("ssid_from_AP_2", "password_for_AP_2");
+  wifiMulti.addAP("ssid_from_AP_3", "password_for_AP_3");
+  
   DS18B20.begin();
   pinMode(TriggerPin, OUTPUT);
   pinMode(EchoPin_J4, INPUT);
@@ -73,11 +89,13 @@ void setup() {
     Serial.print(".");
   }
   // Print local IP address and start web server
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-  server.begin();
+  if (wifiMulti.run() == WL_CONNECTED) {
+    Serial.println("");
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
+    server.begin();
 }
 
 void getTemperature() {
@@ -153,43 +171,51 @@ void loop(){
             } else if (header.indexOf("GET /led_white/on") >= 0) {
               Serial.println("Led White on");
               ledWhiteState = "on";
-              sr.set(4, LOW);
+              sr.set(4, HIGH);
             } else if (header.indexOf("GET /led_white/off") >= 0) {
               Serial.println("Led Green off");
               ledWhiteState = "off";
-              sr.set(4, HIGH);
-            } else if (header.indexOf("GET /first_valve/on") >= 0) {
+              sr.set(4, LOW);
+            } else if (header.indexOf("GET /water_pump/on") >= 0) {
+              Serial.println("Water Pump on");
+              waterPumpState = "on";
+              sr.set(5, HIGH);
+            } else if (header.indexOf("GET /water_pump/off") >= 0) {
+              Serial.println("Water Pump off");
+              waterPumpState = "off";
+              sr.set(5, LOW);
+            } else if (header.indexOf("GET /water_injection/on") >= 0) {
               Serial.println("First Valve on");
-              firstValveState = "on";
-              sr.set(9, HIGH);
-            } else if (header.indexOf("GET /first_valve/off") >= 0) {
-              Serial.println("First Valve off");
-              firstValveState = "off";
-              sr.set(9, LOW);
-            } else if (header.indexOf("GET /second_valve/on") >= 0) {
-              Serial.println("Second Valve on");
-              secondValveState = "on";
-              sr.set(10, HIGH);
-            } else if (header.indexOf("GET /second_valve/off") >= 0) {
-              Serial.println("Second Valve off");
-              secondValveState = "off";
-              sr.set(10, LOW);
-            } else if (header.indexOf("GET /third_valve/on") >= 0) {
-              Serial.println("Third Valve on");
-              thirdValveState = "on";
-              sr.set(11, HIGH);
-            } else if (header.indexOf("GET /third_valve/off") >= 0) {
-              Serial.println("Third Valve off");
-              thirdValveState = "off";
-              sr.set(11, LOW);
-            } else if (header.indexOf("GET /fourth_valve/on") >= 0) {
               Serial.println("Fourth Valve on");
+              firstValveState = "on";
               fourthValveState = "on";
+              waterInjectionState = "on";
+              sr.set(9, HIGH);
               sr.set(12, HIGH);
-            } else if (header.indexOf("GET /fourth_valve/off") >= 0) {
+            } else if (header.indexOf("GET /water_injection/off") >= 0) {
+              Serial.println("First Valve off");
               Serial.println("Fourth Valve off");
+              firstValveState = "off";
               fourthValveState = "off";
+              waterInjectionState = "off";
+              sr.set(9, LOW);
               sr.set(12, LOW);
+            } else if (header.indexOf("GET /water_draining/on") >= 0) {
+              Serial.println("Second Valve on");
+              Serial.println("Third Valve on");
+              secondValveState = "on";
+              thirdValveState = "on";
+              waterDrainingState = "on";
+              sr.set(10, HIGH);
+              sr.set(11, HIGH);
+            } else if (header.indexOf("GET /water_draining/off") >= 0) {
+              Serial.println("Second Valve off");
+              Serial.println("Third Valve off");
+              secondValveState = "off";
+              thirdValveState = "off";
+              waterDrainingState = "off";
+              sr.set(10, LOW);
+              sr.set(11, LOW);
             } 
             
             html();
@@ -317,40 +343,33 @@ void html() {
               client.println("<p><a href=\"/led_white/off\"><button class=\"button button2\" style=\"background-color:#6a6b6a\">OFF</button></a></p>");
             }
 
-            // Display current stawte, and ON/OFF buttons for GPIO 4  
-            client.println("<p>First Valve - State " + firstValveState + "</p>");
-            // If the output4State is off, it displays the ON button       
-            if (firstValveState=="off") {
-              client.println("<p><a href=\"/first_valve/on\"><button class=\"button\">ON</button></a></p>");
+            // Display current state, and ON/OFF buttons for waterPumpState  
+            client.println("<p>Water Pump - State " + waterPumpState + "</p>");
+            // If the output5State is off, it displays the ON button       
+            if (waterPumpState=="off") {
+              client.println("<p><a href=\"/water_pump/on\"><button class=\"button\" style=\"background-color:red\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/first_valve/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/water_pump/off\"><button class=\"button button2\" style=\"background-color:#af0000\">OFF</button></a></p>");
+            } 
+
+            // Display current stawte, and ON/OFF buttons for GPIO 4  
+            client.println("<p>Water Injection - State " + waterInjectionState + "</p>");
+            // If the output4State is off, it displays the ON button       
+            if (waterInjectionState=="off") {
+              client.println("<p><a href=\"/water_injection/on\"><button class=\"button\">ON</button></a></p>");
+            } else {
+              client.println("<p><a href=\"/water_injection/off\"><button class=\"button button2\">OFF</button></a></p>");
             }
 
             // Display current stawte, and ON/OFF buttons for GPIO 4  
-            client.println("<p>Second Valve - State " + secondValveState + "</p>");
+            client.println("<p>Water Draining - State " + waterDrainingState + "</p>");
             // If the output4State is off, it displays the ON button       
-            if (secondValveState=="off") {
-              client.println("<p><a href=\"/second_valve/on\"><button class=\"button\">ON</button></a></p>");
+            if (waterDrainingState=="off") {
+              client.println("<p><a href=\"/water_draining/on\"><button class=\"button\">ON</button></a></p>");
             } else {
-              client.println("<p><a href=\"/second_valve/off\"><button class=\"button button2\">OFF</button></a></p>");
+              client.println("<p><a href=\"/water_draining/off\"><button class=\"button button2\">OFF</button></a></p>");
             }
-             // Display current stawte, and ON/OFF buttons for GPIO 4  
-            client.println("<p>Third Valve - State " + thirdValveState + "</p>");
-            // If the output4State is off, it displays the ON button       
-            if (thirdValveState=="off") {
-              client.println("<p><a href=\"/third_valve/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/third_valve/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
-
-            // Display current stawte, and ON/OFF buttons for GPIO 4  
-            client.println("<p>Fourth Valve - State " + fourthValveState + "</p>");
-            // If the output4State is off, it displays the ON button       
-            if (fourthValveState=="off") {
-              client.println("<p><a href=\"/fourth_valve/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/fourth_valve/off\"><button class=\"button button2\">OFF</button></a></p>");
-            }
+             
             client.println("</body></html>");
             
 }
