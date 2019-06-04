@@ -2,6 +2,7 @@
 #define DataPin D3
 #define ClockPin D1
 #define LatchPin D2
+#define MR D0
 // create shift register object (number of shift registers, data pin, clock pin, latch pin)
 //ShiftRegister74HC595 sr (1, D3,D1,D2); 
 
@@ -14,6 +15,8 @@ void setup() {
   digitalWrite(ClockPin, LOW);
   pinMode(DataPin, OUTPUT);
   digitalWrite(DataPin, LOW);
+  pinMode(MR, OUTPUT);
+  digitalWrite(MR, HIGH);
 }
 
 void loop() {

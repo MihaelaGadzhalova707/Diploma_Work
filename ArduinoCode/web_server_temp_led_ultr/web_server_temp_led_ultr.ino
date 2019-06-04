@@ -1,3 +1,6 @@
+#define ON      LOW
+#define OFF     HIGH
+
 /*********
   Rui Santos
   Complete project details at http://randomnerdtutorials.com  
@@ -14,8 +17,8 @@
 
 // Replace with your network credentials
 
-const char* ssid     = "Bob4o";
-const char* password = "12345678";
+const char* ssid     = "Tardis";
+const char* password = "JustTheDoctor!";
 //const char* ssid     = "TUES Fest 2019";
 //const char* password = "elsysisthebest";
 
@@ -38,7 +41,7 @@ char temperatureCString[7];
 char temperatureFString[7];
 
 // create shift register object (number of shift registers, data pin, clock pin, latch pin)
-ShiftRegister74HC595 sr (2, D3,D1,D2); 
+ShiftRegister74HC595 sr (3, D3,D1,D5); 
 // Set web server port number to 80
 WiFiServer server(80);
 WiFiClient client;
@@ -70,6 +73,16 @@ String waterDrainingState = "off";
 void setup() {
   Serial.begin(115200);
 
+sr.set(1, OFF);
+  sr.set(2, OFF);
+  sr.set(3, OFF);
+  sr.set(4, OFF);
+  sr.set(5, OFF);
+  sr.set(9, OFF);
+  sr.set(10, OFF);
+  sr.set(11, OFF);
+  sr.set(12, OFF);
+
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP("ssid_from_AP_1", "password_for_AP_1");
   wifiMulti.addAP("ssid_from_AP_2", "password_for_AP_2");
@@ -95,6 +108,8 @@ void setup() {
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
   }
+
+  
     server.begin();
 }
 
@@ -147,76 +162,64 @@ void loop(){
             if (header.indexOf("GET /led_red/on") >= 0) {
               Serial.println("Led RED on");
               ledRedState = "on";
-              sr.set(1, HIGH);
+              sr.set(1, ON);
             } else if (header.indexOf("GET /led_red/off") >= 0) {
               Serial.println("Led RED off");
               ledRedState = "off";
-              sr.set(1, LOW);
+              sr.set(1, OFF);
             } else if (header.indexOf("GET /led_green/on") >= 0) {
               Serial.println("Led Green on");
               ledGreenState = "on";
-              sr.set(2, HIGH);
+              sr.set(2, ON);
             } else if (header.indexOf("GET /led_green/off") >= 0) {
               Serial.println("Led Green off");
               ledGreenState = "off";
-              sr.set(2, LOW); 
+              sr.set(2, OFF); 
             } else if (header.indexOf("GET /led_blue/on") >= 0) {
               Serial.println("Led Blue on");
               ledBlueState = "on";
-              sr.set(3, HIGH);
+              sr.set(3, ON);
             } else if (header.indexOf("GET /led_blue/off") >= 0) {
               Serial.println("Led Blue off");
               ledBlueState = "off";
-              sr.set(3, LOW);
+              sr.set(3, OFF);
             } else if (header.indexOf("GET /led_white/on") >= 0) {
               Serial.println("Led White on");
               ledWhiteState = "on";
-              sr.set(4, HIGH);
+              sr.set(4, ON);
             } else if (header.indexOf("GET /led_white/off") >= 0) {
               Serial.println("Led Green off");
               ledWhiteState = "off";
-              sr.set(4, LOW);
+              sr.set(4, OFF);
             } else if (header.indexOf("GET /water_pump/on") >= 0) {
               Serial.println("Water Pump on");
               waterPumpState = "on";
-              sr.set(5, HIGH);
+              sr.set(5, ON);
             } else if (header.indexOf("GET /water_pump/off") >= 0) {
               Serial.println("Water Pump off");
               waterPumpState = "off";
-              sr.set(5, LOW);
+              sr.set(5, OFF);
             } else if (header.indexOf("GET /water_injection/on") >= 0) {
               Serial.println("First Valve on");
               Serial.println("Fourth Valve on");
               firstValveState = "on";
               fourthValveState = "on";
               waterInjectionState = "on";
-              sr.set(9, HIGH);
-              sr.set(12, HIGH);
-            } else if (header.indexOf("GET /water_injection/off") >= 0) {
-              Serial.println("First Valve off");
-              Serial.println("Fourth Valve off");
-              firstValveState = "off";
-              fourthValveState = "off";
-              waterInjectionState = "off";
-              sr.set(9, LOW);
-              sr.set(12, LOW);
+              sr.set(9, ON);
+              sr.set(12, ON);
+              sr.set(10, OFF);
+              sr.set(11, OFF);
             } else if (header.indexOf("GET /water_draining/on") >= 0) {
               Serial.println("Second Valve on");
               Serial.println("Third Valve on");
               secondValveState = "on";
               thirdValveState = "on";
               waterDrainingState = "on";
-              sr.set(10, HIGH);
-              sr.set(11, HIGH);
-            } else if (header.indexOf("GET /water_draining/off") >= 0) {
-              Serial.println("Second Valve off");
-              Serial.println("Third Valve off");
-              secondValveState = "off";
-              thirdValveState = "off";
-              waterDrainingState = "off";
-              sr.set(10, LOW);
-              sr.set(11, LOW);
-            } 
+              sr.set(10, ON);
+              sr.set(11, ON);
+              sr.set(12, OFF);
+              sr.set(9, OFF);
+            }
             
             html();
             // The HTTP response ends with another blank line
