@@ -1,11 +1,3 @@
-#define ON      LOW
-#define OFF     HIGH
-
-/*********
-  Rui Santos
-  Complete project details at http://randomnerdtutorials.com  
-*********/
-
 // Load Wi-Fi library
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -14,24 +6,26 @@
 #include <DallasTemperature.h>
 #include <NewPing.h>
 
-
-// Replace with your network credentials
+//const char* ssid     = "Tardis";
+//const char* password = "JustTheDoctor!";
 
 const char* ssid     = "RetyA6";
 const char* password = "samsungA6";
-//const char* ssid     = "TUES Fest 2019";
-//const char* password = "elsysisthebest";
 
-// Data wire is plugged into pin D1 on the ESP8266 12-E - GPIO 5
+#define ON      LOW
+#define OFF     HIGH
 #define ONE_WIRE_BUS D4
 #define TriggerPin D5
-#define EchoPin_J4 D6
-#define EchoPin_J3 D7
-#define EchoPin_J2 D8
+#define EchoPin_Aquarium D6 //J4
+#define EchoPin_Clear_Water D7 //J3
+#define EchoPin_Dirty_Water D8 //J2
 
-float duration_J4, distance_J4;
-float duration_J3, distance_J3;
-float duration_J2, distance_J2;
+ShiftRegister74HC595 sr (3, D3,D1,D5);
+
+float duration_Aquarium, distance_Aquarium;
+float duration_Clear_Water, distance_Clear_Water;
+float duration_Dirty_Water, distance_Dirty_Water;
+
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
 
@@ -40,17 +34,8 @@ DallasTemperature DS18B20(&oneWire);
 char temperatureCString[7];
 char temperatureFString[7];
 
-// create shift register object (number of shift registers, data pin, clock pin, latch pin)
-ShiftRegister74HC595 sr (3, D3,D1,D5); 
-// Set web server port number to 80
 WiFiServer server(80);
 WiFiClient client;
-ESP8266WiFiMulti wifiMulti;
-
-IPAddress local_IP(192, 168, 0, 111);
-IPAddress gateway(192, 168, 0, 1);
-IPAddress subnet(255, 255, 0, 0);
-
 
 // Variable to store the HTTP request
 String header;
@@ -69,11 +54,10 @@ String fourthValveState = "off"; //2-12
 
 String waterInjectionState = "off";
 String waterDrainingState = "off";
+String waterCirculationState = "off";
 
-void setup() {
-  Serial.begin(115200);
-
-sr.set(1, OFF);
+void set_shift_pins_off() {
+  sr.set(1, OFF);
   sr.set(2, OFF);
   sr.set(3, OFF);
   sr.set(4, OFF);
@@ -82,35 +66,44 @@ sr.set(1, OFF);
   sr.set(10, OFF);
   sr.set(11, OFF);
   sr.set(12, OFF);
+}
 
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP("ssid_from_AP_1", "password_for_AP_1");
-  wifiMulti.addAP("ssid_from_AP_2", "password_for_AP_2");
-  wifiMulti.addAP("ssid_from_AP_3", "password_for_AP_3");
+void setup() {
+
+  set_shift_pins_off();
   
-  DS18B20.begin();
+  // Initializing serial port for debugging purposes
+  Serial.begin(115200);
+  delay(10);
+
+  DS18B20.begin(); // IC Default 9 bit. If you have troubles consider upping it 12. Ups the delay giving the IC more time to process the temperature measurement
+
   pinMode(TriggerPin, OUTPUT);
-  pinMode(EchoPin_J4, INPUT);
-  pinMode(EchoPin_J3, INPUT);
-  pinMode(EchoPin_J2, INPUT);
-  // Connect to Wi-Fi network with SSID and password
+  pinMode(EchoPin_Aquarium, INPUT);
+  pinMode(EchoPin_Clear_Water, INPUT);
+  pinMode(EchoPin_Dirty_Water, INPUT);
+  
+  // Connecting to WiFi network
+  Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
+  
   WiFi.begin(ssid, password);
+  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  // Print local IP address and start web server
-  if (wifiMulti.run() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-  }
-
+  Serial.println("");
+  Serial.println("WiFi connected");
   
-    server.begin();
+  // Starting the web server
+  server.begin();
+  Serial.println("Web server running. Waiting for the ESP IP...");
+  delay(10000);
+  
+  // Printing the ESP IP address
+  Serial.println(WiFi.localIP());
 }
 
 void getTemperature() {
@@ -134,6 +127,174 @@ void trigger_pin() {
   digitalWrite(TriggerPin, LOW);
 }
 
+void echo_pin_dirty_water() {
+  trigger_pin();
+  duration_Dirty_Water = pulseIn(EchoPin_Dirty_Water, HIGH);
+  distance_Dirty_Water = (duration_Dirty_Water / 2) * 0.0343;
+}
+
+void get_distance_dirty_water() {
+  client.print(distance_Dirty_Water);
+  client.println(" cm</h3></body></html>");
+  delay(500); 
+}
+
+void echo_pin_clear_water() {
+  trigger_pin();
+  duration_Clear_Water = pulseIn(EchoPin_Clear_Water, HIGH);
+  distance_Clear_Water = (duration_Clear_Water / 2) * 0.0343;
+}
+
+void get_distance_clear_water() {
+  client.print(distance_Clear_Water);
+  client.println(" cm</h3></body></html>");
+  delay(500); 
+}
+
+void echo_pin_aquarium() {
+  trigger_pin();
+  duration_Aquarium = pulseIn(EchoPin_Aquarium, HIGH);
+  distance_Aquarium = (duration_Aquarium / 2) * 0.0343;
+}
+
+void get_distance_aquarium() {
+  client.print(distance_Aquarium);
+  client.println(" cm</h3></body></html>");
+  delay(500); 
+}
+
+
+void set_red_led_on() {
+  Serial.println("Led RED on");
+  ledRedState = "on";
+  sr.set(1, ON);
+}
+
+void set_red_led_off() {
+  Serial.println("Led RED off");
+  ledRedState = "off";
+  sr.set(1, OFF);
+}
+
+void set_green_led_on() {
+  Serial.println("Led Green on");
+  ledGreenState = "on";
+  sr.set(2, ON);
+}
+
+void set_green_led_off() {
+  Serial.println("Led Green off");
+  ledGreenState = "off";
+  sr.set(2, OFF); 
+}
+
+void set_blue_led_on() {
+  Serial.println("Led Blue on");
+  ledBlueState = "on";
+  sr.set(3, ON);
+}
+
+void set_blue_led_off() {
+  Serial.println("Led Blue off");
+  ledBlueState = "off";
+  sr.set(3, OFF);
+}
+
+void set_white_led_on() {
+  Serial.println("Led White on");
+  ledWhiteState = "on";
+  sr.set(4, ON);
+}
+
+void set_white_led_off() {
+  Serial.println("Led Green off");
+  ledWhiteState = "off";
+  sr.set(4, OFF);
+}
+
+void set_water_pump_on() {
+  Serial.println("Water Pump on");
+  waterPumpState = "on";
+  sr.set(5, ON);
+}
+
+void set_water_pump_off() {
+  Serial.println("Water Pump off");
+  waterPumpState = "off";
+  sr.set(5, OFF);
+}
+
+void set_water_injection_on() {
+  Serial.println("First Valve on");
+  Serial.println("Fourth Valve on");
+  firstValveState = "on";
+  fourthValveState = "on";
+  waterInjectionState = "on";
+  sr.set(9, ON);
+  sr.set(12, ON);
+  sr.set(10, OFF);
+  sr.set(11, OFF);
+}
+
+void set_water_injection_off() {
+  Serial.println("First Valve off");
+  Serial.println("Fourth Valve off");
+  firstValveState = "off";
+  fourthValveState = "off";
+  waterInjectionState = "off";
+  sr.set(9, OFF);
+  sr.set(12, OFF);
+  sr.set(10, OFF);
+  sr.set(11, OFF);
+}
+
+void set_water_draining_on() {
+  Serial.println("Second Valve on");
+  Serial.println("Third Valve on");
+  secondValveState = "on";
+  thirdValveState = "on";
+  waterDrainingState = "on";
+  sr.set(10, ON);
+  sr.set(11, ON);
+  sr.set(12, OFF);
+  sr.set(9, OFF);
+}
+
+void set_water_draining_off() {
+  Serial.println("Second Valve off");
+  Serial.println("Third Valve off");
+  secondValveState = "off";
+  thirdValveState = "off";
+  waterDrainingState = "off";
+  sr.set(10, OFF);
+  sr.set(11, OFF);
+  sr.set(12, OFF);
+  sr.set(9, OFF);
+}
+
+void set_water_circulation_on() {
+  Serial.println("Second Valve on");
+  Serial.println("Fourth Valve on");
+  secondValveState = "on";
+  fourthValveState = "on";
+  waterCirculationState = "on";
+  sr.set(10, ON);
+  sr.set(11, OFF);
+  sr.set(12, ON);
+  sr.set(9, OFF);
+}
+
+void set_water_circulation_off() {
+  Serial.println("Second Valve off");
+  Serial.println("Fourth Valve off");
+  secondValveState = "off";
+  fourthValveState = "off";
+  waterCirculationState = "off";
+  sr.set(10, OFF);
+  sr.set(11, OFF);
+  sr.set(12, OFF);
+  sr.set(9, OFF);
+}
 
 void loop(){
   client = server.available();   // Listen for incoming clients
@@ -160,65 +321,37 @@ void loop(){
             int value;
             // turns the GPIOs on and off
             if (header.indexOf("GET /led_red/on") >= 0) {
-              Serial.println("Led RED on");
-              ledRedState = "on";
-              sr.set(1, ON);
+              set_red_led_on();
             } else if (header.indexOf("GET /led_red/off") >= 0) {
-              Serial.println("Led RED off");
-              ledRedState = "off";
-              sr.set(1, OFF);
+              set_red_led_off();
             } else if (header.indexOf("GET /led_green/on") >= 0) {
-              Serial.println("Led Green on");
-              ledGreenState = "on";
-              sr.set(2, ON);
+              set_green_led_on();
             } else if (header.indexOf("GET /led_green/off") >= 0) {
-              Serial.println("Led Green off");
-              ledGreenState = "off";
-              sr.set(2, OFF); 
+              set_green_led_off();
             } else if (header.indexOf("GET /led_blue/on") >= 0) {
-              Serial.println("Led Blue on");
-              ledBlueState = "on";
-              sr.set(3, ON);
+              set_blue_led_on();
             } else if (header.indexOf("GET /led_blue/off") >= 0) {
-              Serial.println("Led Blue off");
-              ledBlueState = "off";
-              sr.set(3, OFF);
+              set_blue_led_off();
             } else if (header.indexOf("GET /led_white/on") >= 0) {
-              Serial.println("Led White on");
-              ledWhiteState = "on";
-              sr.set(4, ON);
+              set_white_led_on();
             } else if (header.indexOf("GET /led_white/off") >= 0) {
-              Serial.println("Led Green off");
-              ledWhiteState = "off";
-              sr.set(4, OFF);
+              set_white_led_off();
             } else if (header.indexOf("GET /water_pump/on") >= 0) {
-              Serial.println("Water Pump on");
-              waterPumpState = "on";
-              sr.set(5, ON);
+              set_water_pump_on();
             } else if (header.indexOf("GET /water_pump/off") >= 0) {
-              Serial.println("Water Pump off");
-              waterPumpState = "off";
-              sr.set(5, OFF);
+              set_water_pump_off();
             } else if (header.indexOf("GET /water_injection/on") >= 0) {
-              Serial.println("First Valve on");
-              Serial.println("Fourth Valve on");
-              firstValveState = "on";
-              fourthValveState = "on";
-              waterInjectionState = "on";
-              sr.set(9, ON);
-              sr.set(12, ON);
-              sr.set(10, OFF);
-              sr.set(11, OFF);
+              set_water_injection_on();
+            } else if (header.indexOf("GET /water_injection/off") >= 0) {
+              set_water_injection_off();
             } else if (header.indexOf("GET /water_draining/on") >= 0) {
-              Serial.println("Second Valve on");
-              Serial.println("Third Valve on");
-              secondValveState = "on";
-              thirdValveState = "on";
-              waterDrainingState = "on";
-              sr.set(10, ON);
-              sr.set(11, ON);
-              sr.set(12, OFF);
-              sr.set(9, OFF);
+              set_water_draining_on();
+            } else if (header.indexOf("GET /water_draining/off") >= 0) {
+              set_water_draining_off();
+            } else if (header.indexOf("GET /water_circulation/on") >= 0) {
+              set_water_circulation_on();
+            } else if (header.indexOf("GET /water_circulation/off") >= 0) {
+              set_water_circulation_off();
             }
             
             html();
@@ -250,13 +383,21 @@ void html() {
             client.println("<link rel=\"icon\" href=\"data:,\">");
             // CSS to style the on/off buttons 
             // Feel free to change the background-color and font-size attributes to fit your preferences
+
+            client.println("<script type=\"text/javascript\">");
+            client.println("function display_c(){");
+            client.println("var refresh=1000; mytime=setTimeout('display_ct()',refresh)}");
+            client.println("function display_ct() {");
+            client.println("var x = new Date(); var x1=x.toGMTString(); document.getElementById('ct').innerHTML = x1; display_c(); }");
+            client.println("</script>");
+            
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #77878A;}</style></head>");
             
             // Web Page Heading
-            client.println("<body><h1><b>A Q U A    S Y S T E M</b></h1><br>");
+            client.println("<body onload=display_ct();><h1><b>A Q U A    S Y S T E M</b></h1><br>");
             client.println("<h2><i>What is the temperature?</i></h2><h3>Temperature in Celsius: ");
             client.println(temperatureCString);
             client.println("*C</h3><h3>Temperature in Fahrenheit: ");
@@ -264,48 +405,35 @@ void html() {
             client.println("*F</h3><br>"); 
 
             client.println("<h2><i>Distance for the bottle with clear water</i></h2><h3> ");
-            trigger_pin();
-            duration_J2 = pulseIn(EchoPin_J2, HIGH);
-            distance_J2 = (duration_J2 / 2) * 0.0343;
-            
-            Serial.print("Distance = ");
-            client.print("Distance = ");
-            if(distance_J2 >= 100 || distance_J2 <= 2) {
+            if(distance_Clear_Water >= 200 || distance_Clear_Water <= 2) {
               Serial.println("Out of range");
               client.println("Out of range");
             } else {
-              Serial.print(distance_J2);
-              client.println(distance_J2);
-              Serial.println(" cm");
-              client.println(" cm");
+              get_distance_clear_water();
+              Serial.println(distance_Clear_Water);
+              delay(500);
             }
             client.println("</h3><br>");
 
             client.println("<h2><i>Distance for the bottle with dirty water</i></h2><h3> ");
-            trigger_pin();
-            duration_J3 = pulseIn(EchoPin_J3, HIGH);
-            distance_J3 = (duration_J3 / 2) * 0.0343;
-           
-            client.print("Distance = ");
-            if(distance_J3 >= 100 || distance_J3 <= 2) {
+            if(distance_Dirty_Water >= 400 || distance_Dirty_Water <= 2){
+              Serial.println("Out of range");
               client.println("Out of range");
             } else {
-              client.println(distance_J3);
-              client.println(" cm");
+              get_distance_dirty_water();
+              Serial.println(distance_Dirty_Water);
+              delay(500);
             }
             client.println("</h3><br>");
 
             client.println("<h2><i>Distance for the aquarium</i></h2><h3> ");
-            trigger_pin();
-            duration_J4 = pulseIn(EchoPin_J4, HIGH);
-            distance_J4 = (duration_J4 / 2) * 0.0343;
-           
-            client.print("Distance = ");
-            if(distance_J4 >= 100 || distance_J4 <= 2) {
+            if(distance_Aquarium >= 400 || distance_Aquarium <= 2) {
+              Serial.println("Out of range");
               client.println("Out of range");
             } else {
-              client.println(distance_J4);
-              client.println(" cm"); 
+              get_distance_aquarium();
+              Serial.println(distance_Aquarium);
+              delay(500);
             }
             client.println("</h3><br>");
 
@@ -372,7 +500,15 @@ void html() {
             } else {
               client.println("<p><a href=\"/water_draining/off\"><button class=\"button button2\">OFF</button></a></p>");
             }
-             
+
+            // Display current stawte, and ON/OFF buttons for GPIO 4  
+            client.println("<p>Water Circulation - State " + waterCirculationState + "</p>");
+            // If the output4State is off, it displays the ON button       
+            if (waterCirculationState=="off") {
+              client.println("<p><a href=\"/water_circulation/on\"><button class=\"button\">ON</button></a></p>");
+            } else {
+              client.println("<p><a href=\"/water_circulation/off\"><button class=\"button button2\">OFF</button></a></p>");
+            }
             client.println("</body></html>");
             
 }

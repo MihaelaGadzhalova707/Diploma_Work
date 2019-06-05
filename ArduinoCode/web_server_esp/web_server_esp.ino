@@ -9,8 +9,8 @@
 // Replace with your network credentials
 //const char* ssid     = "Bob4o";
 //const char* password = "12345678";
-const char* ssid     = "Mi Phone";
-const char* password = "coffeemaker";
+const char* ssid     = "RetyA6";
+const char* password = "samsungA6";
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -24,7 +24,7 @@ String output4State = "off";
 WiFiClient client;
 // Assign output variables to GPIO pins
 #define output5 D1
-#define output4 D2
+#define output4 D3
 
 void setup() {
   Serial.begin(115200);
@@ -117,17 +117,24 @@ void loop(){
 void html() {
   // Display the HTML web page
             client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+            client.println("<head><meta name=\"viewport\" http-equiv=\"refresh\" content=\"width=device-width, initial-scale=1\">");
             client.println("<link rel=\"icon\" href=\"data:,\">");
             // CSS to style the on/off buttons 
             // Feel free to change the background-color and font-size attributes to fit your preferences
+            client.println("<script type=\"text/javascript\">");
+            client.println("function display_c(){");
+            client.println("var refresh=1000; mytime=setTimeout('display_ct()',refresh)}");
+            client.println("function display_ct() {");
+            client.println("var x = new Date(); var x1=x.toGMTString(); document.getElementById('ct').innerHTML = x1; display_c(); }");
+            client.println("</script>");
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
             client.println(".button2 {background-color: #77878A;}</style></head>");
             
             // Web Page Heading
-            client.println("<body><h1>Web Server</h1>");
+            client.println("<body onload=display_ct();><h1>Web Server</h1>");
+            client.println("<span id='ct' ></span>");
             
             // Display current state, and ON/OFF buttons for GPIO 5  
             client.println("<p>GPIO 5 - State " + output5State + "</p>");
