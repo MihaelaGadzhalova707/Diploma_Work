@@ -6,17 +6,18 @@
 #include <DallasTemperature.h>
 #include <NewPing.h>
 
-//const char* ssid     = "Tardis";
-//const char* password = "JustTheDoctor!";
+/*
+const char* ssid     = "Tardis";
+const char* password = "JustTheDoctor!";
+*/
+char* ssid     = "RetyA6";
+char* password = "samsungA6";
 
-const char* ssid     = "RetyA6";
-const char* password = "samsungA6";
-
-#define ON      LOW
-#define OFF     HIGH
-#define ONE_WIRE_BUS D4
-#define TriggerPin D5
-#define EchoPin_Aquarium D6 //J4
+#define ON                  LOW
+#define OFF                 HIGH
+#define ONE_WIRE_BUS        D4
+#define TriggerPin          D5
+#define EchoPin_Aquarium    D6 //J4
 #define EchoPin_Clear_Water D7 //J3
 #define EchoPin_Dirty_Water D8 //J2
 
@@ -127,41 +128,38 @@ void trigger_pin() {
   digitalWrite(TriggerPin, LOW);
 }
 
-void echo_pin_dirty_water() {
-  trigger_pin();
-  duration_Dirty_Water = pulseIn(EchoPin_Dirty_Water, HIGH);
-  distance_Dirty_Water = (duration_Dirty_Water / 2) * 0.0343;
-}
-
-void get_distance_dirty_water() {
-  client.print(distance_Dirty_Water);
-  client.println(" cm</h3></body></html>");
-  delay(500); 
-}
-
-void echo_pin_clear_water() {
-  trigger_pin();
-  duration_Clear_Water = pulseIn(EchoPin_Clear_Water, HIGH);
-  distance_Clear_Water = (duration_Clear_Water / 2) * 0.0343;
-}
-
-void get_distance_clear_water() {
-  client.print(distance_Clear_Water);
-  client.println(" cm</h3></body></html>");
-  delay(500); 
-}
-
-void echo_pin_aquarium() {
-  trigger_pin();
-  duration_Aquarium = pulseIn(EchoPin_Aquarium, HIGH);
-  distance_Aquarium = (duration_Aquarium / 2) * 0.0343;
-}
-
-void get_distance_aquarium() {
-  client.print(distance_Aquarium);
-  client.println(" cm</h3></body></html>");
-  delay(500); 
-}
+//void echo_pin_dirty_water() {
+//  trigger_pin();
+//  duration_Dirty_Water = pulseIn(EchoPin_Dirty_Water, HIGH);
+//  distance_Dirty_Water = (duration_Dirty_Water / 2) * 0.0343;
+//}
+//
+//void get_distance_dirty_water() {
+//  client.print(distance_Dirty_Water);
+//  delay(500); 
+//}
+//
+//void echo_pin_clear_water() {
+//  trigger_pin();
+//  duration_Clear_Water = pulseIn(EchoPin_Clear_Water, HIGH);
+//  distance_Clear_Water = (duration_Clear_Water / 2) * 0.0343;
+//}
+//
+//void get_distance_clear_water() {
+//  client.print(distance_Clear_Water);
+//  delay(500); 
+//}
+//
+//void echo_pin_aquarium() {
+//  trigger_pin();
+//  duration_Aquarium = pulseIn(EchoPin_Aquarium, HIGH);
+//  distance_Aquarium = (duration_Aquarium / 2) * 0.0343;
+//}
+//
+//void get_distance_aquarium() {
+//  client.print(distance_Aquarium);
+//  delay(500); 
+//}
 
 
 void set_red_led_on() {
@@ -230,6 +228,7 @@ void set_water_injection_on() {
   firstValveState = "on";
   fourthValveState = "on";
   waterInjectionState = "on";
+  sr.set(5, ON);
   sr.set(9, ON);
   sr.set(12, ON);
   sr.set(10, OFF);
@@ -242,6 +241,7 @@ void set_water_injection_off() {
   firstValveState = "off";
   fourthValveState = "off";
   waterInjectionState = "off";
+  sr.set(5, OFF);
   sr.set(9, OFF);
   sr.set(12, OFF);
   sr.set(10, OFF);
@@ -254,6 +254,7 @@ void set_water_draining_on() {
   secondValveState = "on";
   thirdValveState = "on";
   waterDrainingState = "on";
+  sr.set(5, ON);
   sr.set(10, ON);
   sr.set(11, ON);
   sr.set(12, OFF);
@@ -266,6 +267,7 @@ void set_water_draining_off() {
   secondValveState = "off";
   thirdValveState = "off";
   waterDrainingState = "off";
+  sr.set(5, OFF);
   sr.set(10, OFF);
   sr.set(11, OFF);
   sr.set(12, OFF);
@@ -278,6 +280,7 @@ void set_water_circulation_on() {
   secondValveState = "on";
   fourthValveState = "on";
   waterCirculationState = "on";
+  sr.set(5, ON);
   sr.set(10, ON);
   sr.set(11, OFF);
   sr.set(12, ON);
@@ -290,6 +293,7 @@ void set_water_circulation_off() {
   secondValveState = "off";
   fourthValveState = "off";
   waterCirculationState = "off";
+  sr.set(5, OFF);
   sr.set(10, OFF);
   sr.set(11, OFF);
   sr.set(12, OFF);
@@ -398,6 +402,7 @@ void html() {
             
             // Web Page Heading
             client.println("<body onload=display_ct();><h1><b>A Q U A    S Y S T E M</b></h1><br>");
+             client.println("<span id='ct' ></span>");
             client.println("<h2><i>What is the temperature?</i></h2><h3>Temperature in Celsius: ");
             client.println(temperatureCString);
             client.println("*C</h3><h3>Temperature in Fahrenheit: ");
@@ -405,35 +410,53 @@ void html() {
             client.println("*F</h3><br>"); 
 
             client.println("<h2><i>Distance for the bottle with clear water</i></h2><h3> ");
-            if(distance_Clear_Water >= 200 || distance_Clear_Water <= 2) {
+            trigger_pin();
+            duration_Clear_Water = pulseIn(EchoPin_Clear_Water, HIGH);
+            distance_Clear_Water = (duration_Clear_Water / 2) * 0.0343;
+           
+            client.print("Distance = ");
+            if(distance_Clear_Water >= 100 || distance_Clear_Water <= 2) {
               Serial.println("Out of range");
               client.println("Out of range");
             } else {
-              get_distance_clear_water();
-              Serial.println(distance_Clear_Water);
-              delay(500);
+              Serial.print(distance_Clear_Water);
+              client.println(distance_Clear_Water);
+              Serial.println(" cm");
+              client.println(" cm");
             }
             client.println("</h3><br>");
 
             client.println("<h2><i>Distance for the bottle with dirty water</i></h2><h3> ");
-            if(distance_Dirty_Water >= 400 || distance_Dirty_Water <= 2){
+            trigger_pin();
+            duration_Dirty_Water = pulseIn(EchoPin_Dirty_Water, HIGH);
+            distance_Dirty_Water = (duration_Dirty_Water / 2) * 0.0343;
+            
+            Serial.print("Distance = ");
+            client.print("Distance = ");
+            if(distance_Dirty_Water >= 100 || distance_Dirty_Water <= 2) {
               Serial.println("Out of range");
               client.println("Out of range");
             } else {
-              get_distance_dirty_water();
-              Serial.println(distance_Dirty_Water);
-              delay(500);
+              Serial.print(distance_Dirty_Water);
+              client.println(distance_Dirty_Water);
+              Serial.println(" cm");
+              client.println(" cm");
             }
             client.println("</h3><br>");
 
             client.println("<h2><i>Distance for the aquarium</i></h2><h3> ");
-            if(distance_Aquarium >= 400 || distance_Aquarium <= 2) {
-              Serial.println("Out of range");
+            trigger_pin();
+            duration_Aquarium = pulseIn(EchoPin_Aquarium, HIGH);
+            distance_Aquarium = (duration_Aquarium / 2) * 0.0343;
+           
+            client.print("Distance = ");
+            if(distance_Aquarium >= 100 || distance_Aquarium <= 2) {
               client.println("Out of range");
             } else {
-              get_distance_aquarium();
-              Serial.println(distance_Aquarium);
-              delay(500);
+              Serial.print(distance_Aquarium);
+              client.println(distance_Aquarium);
+              Serial.println(" cm");
+              client.println(" cm"); 
             }
             client.println("</h3><br>");
 
