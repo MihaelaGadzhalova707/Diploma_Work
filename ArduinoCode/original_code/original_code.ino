@@ -389,10 +389,14 @@ void html() {
             // Feel free to change the background-color and font-size attributes to fit your preferences
 
             client.println("<script type=\"text/javascript\">");
-            client.println("function display_c(){");
-            client.println("var refresh=1000; mytime=setTimeout('display_ct()',refresh)}");
             client.println("function display_ct() {");
-            client.println("var x = new Date(); var x1=x.toGMTString(); document.getElementById('ct').innerHTML = x1; display_c(); }");
+            client.println("var x = new Date(); var month=x.getMonth()+1; var day=x.getDate(); var year=x.getFullYear();");
+            client.println("if (month <10 ){month='0' + month;} if (day <10 ){day='0' + day;}");
+            client.println("var x3= day+'-'+month+'-'+year;");
+            client.println("var hour=x.getHours(); var minute=x.getMinutes(); var second=x.getSeconds();");
+            client.println("if(hour <10 ){hour='0'+hour;} if(minute <10 ) {minute='0' + minute; } if(second<10){second='0' + second;}");
+            client.println("var x3 = 'Last refreshed: ' + x3 + ' ' +  hour+':'+minute+':'+second");
+            client.println("document.getElementById('ct').innerHTML = x3; }");
             client.println("</script>");
             
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
